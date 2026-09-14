@@ -4,13 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}GraphCart{% endblock %} | Neo4j Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
   <div class="container"><a class="navbar-brand fw-bold" href="/"><span class="brand-mark">G</span> GraphCart</a><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
-    <div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav me-auto gap-lg-1"><li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Overview</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/products') %}active{% endif %}" href="/products">Products</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/customers') %}active{% endif %}" href="/customers">Customers</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/inventory') %}active{% endif %}" href="/inventory">Inventory</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/recommendations') %}active{% endif %}" href="/recommendations">Recommendations</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/orders') %}active{% endif %}" href="/orders">Orders</a></li></ul><form method="post" action="/reset"><button class="btn btn-reset btn-sm" onclick="return confirm('Reset all data to the demo dataset?')">Reset demo data</button></form></div>
+    <div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav me-auto gap-lg-1"><li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"><span class="material-symbols-rounded">space_dashboard</span>Overview</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/products') %}active{% endif %}" href="/products"><span class="material-symbols-rounded">inventory_2</span>Products</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/customers') %}active{% endif %}" href="/customers"><span class="material-symbols-rounded">group</span>Customers</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/inventory') %}active{% endif %}" href="/inventory"><span class="material-symbols-rounded">warehouse</span>Inventory</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/recommendations') %}active{% endif %}" href="/recommendations"><span class="material-symbols-rounded">auto_awesome</span>Recommendations</a></li><li class="nav-item"><a class="nav-link {% if request.path.startswith('/orders') %}active{% endif %}" href="/orders"><span class="material-symbols-rounded">shopping_bag</span>Orders</a></li></ul><form method="post" action="/reset"><button class="btn btn-reset btn-sm" onclick="return confirm('Reset all data to the demo dataset?')"><span class="material-symbols-rounded">restart_alt</span>Reset demo data</button></form></div>
   </div>
 </nav>
 <main class="container py-4">
