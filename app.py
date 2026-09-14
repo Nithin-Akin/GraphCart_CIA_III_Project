@@ -103,7 +103,25 @@ def dashboard():
     stats = query("MATCH (n) RETURN labels(n)[0] AS label, count(n) AS total")
     stat_map = {row["label"]: row["total"] for row in stats}
     low_stock = query("MATCH (p:Product)-[s:STOCKED_AT]->(w:Warehouse) WHERE s.quantity <= s.reorder_level RETURN p.name AS product, w.name AS warehouse, s.quantity AS quantity ORDER BY s.quantity")
-    return render_template("dashboard.html", stats=stat_map, low_stock=low_stock)
+    kpis = query("""CALL { MATCH (o:Order) RETURN count(o) AS orders }
+        CALL { MATCH ()-[s:STOCKED_AT]->() RETURN coalesce(sum(s.quantity),0) AS units }
+        CALL { MATCH (o:Order)-[i:CONTAINS]->(p:Product) RETURN coalesce(sum(i.quantity * coalesce(i.unit_price,p.price)),0) AS revenue }
+        RETURN orders, units, revenue""")[0]
+    category_sales = query("""MATCH (o:Order)-[i:CONTAINS]->(p:Product)
+        RETURN p.category AS category, sum(i.quantity * coalesce(i.unit_price,p.price)) AS revenue
+        ORDER BY revenue DESC""")
+    warehouse_stock = query("""MATCH (p:Product)-[s:STOCKED_AT]->(w:Warehouse)
+        RETURN w.name AS warehouse, sum(s.quantity) AS units ORDER BY units DESC""")
+    top_products = query("""MATCH (c:Customer)-[r:PURCHASED]->(p:Product)
+        RETURN p.name AS product, sum(r.quantity) AS units ORDER BY units DESC LIMIT 5""")
+    recent_orders = query("""MATCH (o:Order)-[:PLACED_BY]->(c:Customer)
+        MATCH (o)-[i:CONTAINS]->(p:Product) MATCH (o)-[:SHIPPED_FROM]->(w:Warehouse)
+        RETURN o.id AS id, o.date AS date, c.name AS customer, p.name AS product,
+        i.quantity AS quantity, w.name AS warehouse ORDER BY o.date DESC LIMIT 5""")
+    relationships = query("MATCH ()-[r]->() RETURN count(r) AS total")[0]["total"]
+    return render_template("dashboard.html", stats=stat_map, kpis=kpis, low_stock=low_stock,
+                           category_sales=category_sales, warehouse_stock=warehouse_stock,
+                           top_products=top_products, recent_orders=recent_orders, relationships=relationships)
 
 
 @app.route("/products", methods=["GET", "POST"])
@@ -213,7 +231,7 @@ def orders():
                 MATCH (p)-[s:STOCKED_AT]->(w:Warehouse) WHERE s.quantity >= $qty
                 WITH c,p,s,w ORDER BY s.quantity DESC LIMIT 1
                 CREATE (o:Order {id:$oid, date:$date, status:'Shipped'})-[:PLACED_BY]->(c)
-                CREATE (o)-[:CONTAINS {quantity:$qty}]->(p)
+                CREATE (o)-[:CONTAINS {quantity:$qty, unit_price:p.price}]->(p)
                 CREATE (o)-[:SHIPPED_FROM]->(w)
                 CREATE (c)-[:PURCHASED {date:$date, quantity:$qty, order_id:$oid}]->(p)
                 SET s.quantity=s.quantity-$qty
