@@ -18,7 +18,7 @@ Install Docker Desktop, open a terminal in this folder, then run:
 docker compose up --build
 ```
 
-Open the app at `http://localhost:5001` and Neo4j Browser at `http://localhost:7474`.
+Open the app at `http://localhost:5001` and Neo4j Browser at `http://localhost:7475`.
 
 Neo4j credentials:
 
